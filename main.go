@@ -6,10 +6,28 @@ import (
 	"gorm.io/gorm"
 )
 
-type Product struct {
+type Food struct {
 	gorm.Model
-	Code  string
+	Name  string
 	Price uint
+	Amount uint
+}
+
+type Restaurant struct {
+	gorm.Model
+	Name  string
+	LocationId uint
+}
+
+type FoodOfRestaurant struct {
+	gorm.Model
+	ResId  uint
+	FoodId uint
+}
+
+type Location struct {
+	gorm.Model
+	LocationAddress string
 }
 
 func main() {
@@ -19,15 +37,31 @@ func main() {
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&Product{})
+	db.AutoMigrate(&Food{})
+	db.AutoMigrate(&Restaurant{})
+	db.AutoMigrate(&Location{})
 
 	// Create
-	db.Create(&Product{Code: "D42", Price: 100})
+	db.Create(&Food{Name: "Orange Cake", Price: 100, Amount:200})
+	db.Create(&Food{Name: "Chocolate Cake", Price: 120, Amount:50})
+	db.Create(&Food{Name: "Strawberry Cake", Price: 120, Amount:100})
+	db.Create(&Food{Name: "Brownie", Price: 140, Amount:250})
 
+	db.Create(&Restaurant{Name: "Mint Sweet", LocationId: 1})
+	db.Create(&Restaurant{Name: "Chocolate House", LocationId: 2})
+
+	db.Create(&FoodOfRestaurant{ResId: 1, FoodId: 1})
+	db.Create(&FoodOfRestaurant{ResId: 1, FoodId: 2})
+	db.Create(&FoodOfRestaurant{ResId: 2, FoodId: 2})
+	db.Create(&FoodOfRestaurant{ResId: 1, FoodId: 3})
+	db.Create(&FoodOfRestaurant{ResId: 2, FoodId: 4})
+
+	db.Create(&Location{LocationAddress: "MBK Bangkok"})
+	db.Create(&Location{LocationAddress: "101 True Digital Park"})
 	// Read
-	var product Product
-	db.First(&product, 1)                 // find product with integer primary key
-	db.First(&product, "code = ?", "D42") // find product with code D42
+	var food Food
+	db.First(&food, 1)                 
+	db.First(&food, "name = ?", "Orange Cake") 
 
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
@@ -37,8 +71,7 @@ func main() {
 	})
 	r.GET("/welcome", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "hello world",
-			"product": product,
+			"food": food,
 		})
 	})
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
