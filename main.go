@@ -1,21 +1,17 @@
 package main
 
 import (
+	"go-gin-api/models"
+	"go-gin-api/utils"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-type Food struct {
-	gorm.Model
-	Name  string
-	Price uint
-	Amount uint
-}
-
 type Restaurant struct {
 	gorm.Model
-	Name  string
+	Name       string
 	LocationId uint
 }
 
@@ -37,15 +33,15 @@ func main() {
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&Food{})
+	db.AutoMigrate(&models.Food{})
 	db.AutoMigrate(&Restaurant{})
 	db.AutoMigrate(&Location{})
 
 	// Create
-	db.Create(&Food{Name: "Orange Cake", Price: 100, Amount:200})
-	db.Create(&Food{Name: "Chocolate Cake", Price: 120, Amount:50})
-	db.Create(&Food{Name: "Strawberry Cake", Price: 120, Amount:100})
-	db.Create(&Food{Name: "Brownie", Price: 140, Amount:250})
+	db.Create(&models.Food{Name: "Orange Cake", Price: 100, Amount: 200})
+	db.Create(&models.Food{Name: "Chocolate Cake", Price: 120, Amount: 50})
+	db.Create(&models.Food{Name: "Strawberry Cake", Price: 120, Amount: 100})
+	db.Create(&models.Food{Name: "Brownie", Price: 140, Amount: 250})
 
 	db.Create(&Restaurant{Name: "Mint Sweet", LocationId: 1})
 	db.Create(&Restaurant{Name: "Chocolate House", LocationId: 2})
@@ -58,10 +54,13 @@ func main() {
 
 	db.Create(&Location{LocationAddress: "MBK Bangkok"})
 	db.Create(&Location{LocationAddress: "101 True Digital Park"})
+
+	utils.PrepareDB(db)
+
 	// Read
-	var food Food
-	db.First(&food, 1)                 
-	db.First(&food, "name = ?", "Orange Cake") 
+	var food models.Food
+	db.First(&food, 1)
+	db.First(&food, "name = ?", "Orange Cake")
 
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
