@@ -32,10 +32,12 @@ func PrepareDB(db *gorm.DB) {
 	db.Create(&models.Location{LocationAddress: "101 True Digital Park"})
 }
 
-func GetFoodListOfRestaurant(db *gorm.DB) listFoods {
-	var food models.Food
-	var foodOfRestaurant models.FoodOfRestaurant
-	listFood := db.Select("id").Find(&foodOfRestaurant, "resId = ?", 2)
-	db.Find(&food, "id = ?", listFood)
-	listFoods := db.Find(&food, listFood)
+func GetFoodListOfRestaurant(db *gorm.DB, resId Int) []*models.Food {
+	var food []*models.Food
+	var foodOfRestaurant []*models.FoodOfRestaurant
+	queryResult := db.Select("id").Find(&foodOfRestaurant, "resId = ?", resId)
+	db.Find(&food, "id = ?", foodOfRestaurant)
+	queryResult2 := db.Find(&food, listFood)
+	
+	return 
 }
